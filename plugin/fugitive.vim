@@ -1254,7 +1254,7 @@ function! s:Grep(cmd,bang,arg) abort
     execute cd.'`=s:repo().tree()`'
     let &grepprg = s:repo().git_command('--no-pager', 'grep', '-n', '--no-color')
     let &grepformat = '%f:%l:%m'
-    exe a:cmd.'! '.escape(matchstr(a:arg,'\v\C.{-}%($|[''" ]\@=\|)@='),'|')
+    silent exe a:cmd.'! '.escape(matchstr(a:arg,'\v\C.{-}%($|[''" ]\@=\|)@='),'|')
     let list = a:cmd =~# '^l' ? getloclist(0) : getqflist()
     for entry in list
       if bufname(entry.bufnr) =~ ':'
@@ -1275,7 +1275,8 @@ function! s:Grep(cmd,bang,arg) abort
     if !a:bang && !empty(list)
       return (a:cmd =~# '^l' ? 'l' : 'c').'first'.matchstr(a:arg,'\v\C[''" ]\zs\|.*')
     else
-      return matchstr(a:arg,'\v\C[''" ]\|\zs.*')
+      redraw!
+      return (a:cmd =~# '^l' ? 'l' : 'c').'open'
     endif
   finally
     let &grepprg = grepprg
